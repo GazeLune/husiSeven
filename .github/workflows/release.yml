@@ -63,7 +63,7 @@ jobs:
       - name: Generate about libraries metadata
         run: make aboutlibraries_go aboutlibraries_android
       - name: Build Android app
-        run: make apk
+        run: make apk_debug
       - uses: actions/upload-artifact@v7
         with:
           name: android
