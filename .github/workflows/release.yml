@@ -52,13 +52,10 @@ jobs:
       - name: Prepare assets
         if: steps.cache-assets.outputs.cache-hit != 'true'
         run: make assets
-      - name: Generate keystore and signing properties
+      - name: Write signing properties
         env:
-          KEY_PASS: ${{ secrets.SIGNING_PASS }}
-        run: |
-          rm -f release.keystore
-          keytool -genkeypair -v -keystore release.keystore -alias husi -keyalg RSA -keysize 2048 -validity 10000 -storepass "$KEY_PASS" -keypass "$KEY_PASS" -dname "CN=Husi, OU=Dev, O=None, L=None, S=None, C=CN"
-          printf "KEYSTORE_PASS=%s\nALIAS_NAME=husi\nALIAS_PASS=%s\n" "$KEY_PASS" "$KEY_PASS" > local.properties
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+        run: printf '%s' "$LOCAL_PROPERTIES" > local.properties
       - name: Build Android libcore
         run: make libcore_android
       - name: Download Go modules
@@ -66,7 +63,7 @@ jobs:
       - name: Generate about libraries metadata
         run: make aboutlibraries_go aboutlibraries_android
       - name: Build Android app
-        run: make apk
+        run: make apk_debug
       - uses: actions/upload-artifact@v7
         with:
           name: android
